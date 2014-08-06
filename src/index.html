@@ -1,0 +1,33 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css"/>
+    <link rel="stylesheet" href="stylesheets/main.css">
+
+</head>
+<body>
+    <div class="container">
+    <span class="loading">Loading camera...</span>
+
+        <canvas id=image_canvas width="640" height="480">Your browser does not support the canvas element.</canvas>
+        <div class="bar row">
+
+           <div class="large-12 columns talk">
+            <input name='say' id='say' checked="checked" type="checkbox"> <label for="say">Talk?</label>
+
+        </div>
+        <div class="large-12 columns">
+          <label>
+           <input id="output" type="text" placeholder='Color name'>
+       </label>
+         </div>
+</div>
+</div>
+<video id="video" width="640" height="480" autoplay></video>
+<!-- <script src="bower_components/color_dictionary/dist/color_dictionary.min.js"></script>
+<script src="scripts/color_dict.js"></script>
+<script src="scripts/color.js"></script> -->
+
+<script src="scripts/app.js"></script>
+
+</body>
+</html>

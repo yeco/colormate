@@ -1,0 +1,55 @@
+body, * {
+  font-family: sans-serif;
+}
+ 
+
+html, body{
+  background: url(../images/shattered.png);
+}
+
+#output{
+  font-size: 1.8em;
+}
+
+.loading{
+  position: absolute;
+  top: 180;
+  text-align: center;
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0.2;
+}
+
+video{
+  display: none;
+}
+canvas{
+  position: absolute;
+  top:0;
+  cursor: crosshair;
+}
+
+.container{
+  width: 648px;
+  min-height: 488px;
+  margin: auto;
+  position:relative;
+  margin-top: 40px;
+  border: solid 4px #BFC5C5;
+
+}
+
+.bar{
+  display: block;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  background: rgba(201, 201, 201, 0.5);
+}
+.talk{
+  background: rgba(201, 201, 201, 0.5);
+  padding-top: 10px;
+  height: 38px;
+  margin-bottom: 14px;
+}

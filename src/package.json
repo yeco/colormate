@@ -1,0 +1,21 @@
+{
+  "main": "index.html",
+  "name": "Colormate",
+  "description": "Daltonian helper",
+  "version": "0.1.0",
+  "keywords": [ "daltonism", "color-blindness" ],
+  "window": {
+    "title": "node-webkit demo",
+    "icon": "link.png",
+    "toolbar": false,
+    "frame": false,
+    "width": 600,
+    "height": 700,
+    "position": "mouse",
+    "resizable": false,
+    "show_in_taskbar":true
+  },
+  "webkit": {
+    "plugin": true
+  }
+}

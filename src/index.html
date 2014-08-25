@@ -1,31 +1,53 @@
 <html>
 <head>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css"/>
-    <link rel="stylesheet" href="stylesheets/main.css">
+ <link rel="stylesheet" href="stylesheets/main.css">
 
 </head>
 <body>
-    <div class="container">
-    <span class="loading">Loading camera...</span>
+  <div class="top-controls">
+    <div class="top-controls-left">
+      <ul>
+        <li><span class="top-control-btn btn-close">x</span></li>
+        <li><span class="top-control-btn btn-minimize">_</span></li>
+      </ul>
 
-        <canvas id=image_canvas width="640" height="480">Your browser does not support the canvas element.</canvas>
-        <div class="bar row">
+    </div>
+    <div class="top-controls-right">
+      <ul>
+        <li><span class="top-control-btn btn-dev">O</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container">
 
-           <div class="large-12 columns talk">
+    <div class="video_container">
+        <span class="loading">Loading camera...</span>
+        <canvas id=image_canvas width="600" height="380">Your browser does not support the canvas element.</canvas>
+    </div>
+
+    <div class="video_label">
+      <p>Click on the color you want me to tell you.</p>
+    </div>
+
+  </div>
+  
+
+           <div class="talk">
             <input name='say' id='say' checked="checked" type="checkbox"> <label for="say">Talk?</label>
 
         </div>
+
+<!-- 
+ <div class="bar row">
         <div class="large-12 columns">
           <label>
            <input id="output" type="text" placeholder='Color name'>
        </label>
-         </div>
+         </div> -->
+
+
 </div>
-</div>
-<video id="video" width="640" height="480" autoplay></video>
-<!-- <script src="bower_components/color_dictionary/dist/color_dictionary.min.js"></script>
-<script src="scripts/color_dict.js"></script>
-<script src="scripts/color.js"></script> -->
+<video id="video" width="600" height="380" autoplay></video>
 
 <script src="scripts/app.js"></script>
 

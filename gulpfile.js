@@ -6,9 +6,11 @@ var gulp = require('gulp'),
     path = require('path'),
     tinylr = require('tiny-lr'),
     app = express(),
-    server = tinylr();
+    server = tinylr(),
+    NwBuilder = require('node-webkit-builder'),
+    runSequence = require('run-sequence'),
+    size = require('gulp-size');
 
-var size = require('gulp-size');
 var config = {
     dist: "dist",
     src: "src",
@@ -23,13 +25,14 @@ gulp.task('html', function() {
 });
 
 gulp.task('compass', function() {
-    gulp.src("./src" + '/stylesheets/*.scss')
+     gulp.src("./src/stylesheets/*.scss")
         .pipe($.plumber())
         .pipe($.compass({
-            css: "./dist" + '/stylesheets',
-            sass: "./src" + '/stylesheets'
+            project: __dirname,
+            css: "dist/stylesheets",
+            sass: "src/stylesheets"
         }))
-        .pipe(gulp.dest("./dist" + '/stylesheets'))
+        .pipe(gulp.dest("./dist/stylesheets"))
         .pipe($.livereload(server));
 });
 
@@ -62,7 +65,9 @@ gulp.task('templates', function() {
 });
 
 gulp.task('express', function() {
-    app.use(express.static(path.resolve("./dist")));
+    app.use(express.static(path.resolve("dist")));
+    app.use(require('connect-livereload')());
+
     app.listen(1337);
     $.util.log('Listening on port: 1337');
 });
@@ -80,16 +85,34 @@ gulp.task('watch', function() {
         if (err) {
             return console.log(err);
         }
-
-        gulp.watch("./src" + '/stylesheets/*.scss', ['compass']);
-
-        gulp.watch("./src" + '/scripts/*.js', ['js']);
-
-        gulp.watch("./src" + '/*.html', ['html']);
-        gulp.watch("./src" + '/*.jade', ['templates']);
+        gulp.watch("./src/stylesheets/*.scss", ['compass']);
+        gulp.watch('./src/scripts/*.js', ['js']);
+        gulp.watch('./src/*.html', ['html']);
+        gulp.watch('./src/*.jade', ['templates']);
 
     });
 });
 
+gulp.task('pkg', function () {
+    gulp.src('./src/package.json')
+    .pipe(gulp.dest('./dist/'));
+})
+
+gulp.task("buildwk", function() {
+ 
+    var nw = new NwBuilder({
+        files: './dist/**/**', // use the glob format
+        platforms: ['osx']
+    });
+
+    nw.build()
+});
+ 
+
 // Default Task
 gulp.task('default', ['js', 'compass', 'images', 'html', 'express', 'watch', 'serve']);
+
+
+gulp.task('build', function (callback) {
+    runSequence(['js', 'compass', 'images', 'html', 'pkg'], 'buildwk', callback);
+});

@@ -1,11 +1,17 @@
 'use strict';
+global = (typeof global != 'object') ? global: window;
+
 var diff = require('color-diff');
 var colors = require('./colors');
+var gui = global.window.nwDispatcher.requireNwGui();
+var win = gui.Window.get();
+
 
 var App = function() {
     var canvas, context, img;
 
     this.video = document.getElementById("video");
+
     this.videoObj = {
         "video": true
     },
@@ -55,7 +61,10 @@ App.prototype.drawVideoInCanvas = function() {
         self.context.drawImage(video, 0, 0, 640, 480);
     }, 100)
 }
-
+App.prototype.hideLoader = function () {
+    var loading = document.querySelector('.loading');
+    loading.style.display= "none";
+}
 
 App.prototype.findPos = function(obj) {
     var current_left = 0,
@@ -73,9 +82,11 @@ App.prototype.findPos = function(obj) {
     return undefined;
 }
 
-App.prototype.output = function(str) {
-    var out = document.getElementById('output');
-    out.value = str;
+App.prototype.output = function(o) {
+    var out = document.querySelector('.video_label p');
+    var h = this.rgbToHex(o.R, o.G, o.B);
+    var colorStr = "<span style='color: " + h + "'>" + o.name +"</span>";
+    out.innerHTML = "It's " + colorStr + "!";
 }
 
 App.prototype.rounded = function(num) {
@@ -89,40 +100,56 @@ App.prototype.registerEventListeners = function(argument) {
         var position = self.findPos(this);
         var x = e.pageX - position.x;
         var y = e.pageY - position.y;
-        var coordinate = "x=" + x + ", y=" + y;
-        var canvas = this.getContext('2d');
+            var context = this.getContext('2d');
 
-
-
-        var colors = self.getColors(canvas, x, y, 10, 10);
-        var outputstr = "";
-        var averageColor = {};
-        var colorval = 0;
-        for (var hex in colors) {
-            if (colors[hex].index > colorval) {
-                colorval = colors[hex].index;
-                averageColor = colors[hex].rgb;
-            }
-        }
-
-        var palette = self.palette;
-
-        var rgb = self.saturate(averageColor, 1.5);
-        console.log(rgb);
-        var closest = diff.closest(rgb, palette); // {R: 255, G: 0, B: 0 }, red
-
-        self.setBGColor(rgb);
-        self.output(closest.name);
-        self.say(closest.name);
+        self.extractColor(context,x, y);
 
     });
 
     this.video.addEventListener("loadeddata", function() {
         self.drawVideoInCanvas();
+        self.hideLoader();
     }, false);
+
+
+    var btn_close = document.querySelector('.btn-close');
+    btn_close.addEventListener('click',  function () {
+        win.close()
+    });
+    var btn_minimize = document.querySelector('.btn-minimize');
+    btn_minimize.addEventListener('click',  function () {
+        win.minimize()
+    })
+
+    var btn_dev = document.querySelector('.btn-dev');
+    btn_dev.addEventListener('click',  function () {
+        win.showDevTools()
+    })
+
 
 }
 
+App.prototype.extractColor = function(context, x, y) {
+    var self = this;
+
+    var colors = self.getColors(context, x, y, 10, 10);
+    var averageColor = {};
+    var colorval = 0;
+    for (var hex in colors) {
+        if (colors[hex].index > colorval) {
+            colorval = colors[hex].index;
+            averageColor = colors[hex].rgb;
+        }
+    }
+
+    var palette = self.palette;
+
+    var rgb = self.saturate(averageColor, 1.5);
+    var closest = diff.closest(rgb, palette); // {R: 255, G: 0, B: 0 }, red
+
+    self.output(closest);
+    self.say(closest.name);
+}
 
 App.prototype.setBGColor = function(color) {
     var body = document.getElementsByTagName('body');

@@ -22,7 +22,8 @@
     "gulp-load-plugins": "^0.5.1",
     "color-diff": "~0.1.3",
     "gulp-open": "~0.2.8",
-    "node-webkit-builder": "~0.1.2"
+    "node-webkit-builder": "~0.1.2",
+    "annyang": "~1.0.1"
   },
   "devDependencies": {
     "gulp-size": "~0.4.0",

@@ -383,12 +383,12 @@ var colors = [{
         G: 0,
         B: 0
     }, {
-        name: "gray / grey",
+        name: "gray",
         R: 128,
         G: 128,
         B: 128
     }, {
-        name: "dark gray / dark grey",
+        name: "dark gray",
         R: 169,
         G: 169,
         B: 169
@@ -398,7 +398,7 @@ var colors = [{
         G: 192,
         B: 192
     }, {
-        name: "light gray / light grey",
+        name: "light gray",
         R: 211,
         G: 211,
         B: 211

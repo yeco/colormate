@@ -1,11 +1,17 @@
 'use strict';
-global = (typeof global != 'object') ? global: window;
+var global = (typeof global === 'object') ? global : window;
 
 var diff = require('color-diff');
 var colors = require('./colors');
+var isDesktop = false;
+
+if(typeof global.window.nwDispatcher === 'object'){
+ isDesktop = true;   
 var gui = global.window.nwDispatcher.requireNwGui();
 var win = gui.Window.get();
-
+}
+    
+var annyang = require('annyang');
 
 var App = function() {
     var canvas, context, img;
@@ -20,6 +26,15 @@ var App = function() {
     };
 
     this.palette = colors;
+
+
+    this.voiceCommands = {
+        'hello': function () {
+            console.log('hola')
+        }
+    }
+    // annyang.addCommands(this.voiceCommands);
+
 }
 
 
@@ -28,6 +43,8 @@ App.prototype.init = function() {
     this.context = this.canvas.getContext('2d');
     this.registerEventListeners();
     this.initCamera();
+
+            // annyang.start({ autoRestart: false });
 
 }
 
@@ -110,6 +127,7 @@ App.prototype.registerEventListeners = function(argument) {
         self.drawVideoInCanvas();
         self.hideLoader();
     }, false);
+    if(isDesktop){
 
 
     var btn_close = document.querySelector('.btn-close');
@@ -126,6 +144,7 @@ App.prototype.registerEventListeners = function(argument) {
         win.showDevTools()
     })
 
+    }
 
 }
 
@@ -310,3 +329,5 @@ App.prototype.HSVtoRGB = function(color) {
     }
     return [r, g, b];
 };
+
+

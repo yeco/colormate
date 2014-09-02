@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+    "name": "Colormate",
+    "description": "__MSG_appDescription__",
+    "version": "0.1",
+    "minimum_chrome_version": "23",
+    "icons": {
+        "16": "images/icon-16.png",
+        "128": "images/icon-128.png",
+        "256": "images/icon-256.png"
+    },
+    "default_locale": "en",
+    "app": {
+        "background": {
+            "scripts": [
+                "scripts/chrome/chromereload.js",
+                "scripts/chrome/background.js"
+            ]
+
+
+        }
+    },
+    "permissions": [
+        "storage",
+        "videoCapture",
+        "tts",
+        "audioCapture"
+    ]
+}

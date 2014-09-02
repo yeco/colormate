@@ -48,6 +48,21 @@ gulp.task('js', function() {
         .pipe($.livereload(server));
 });
 
+gulp.task('chrome_js', function() {
+    return gulp.src("./src" + '/scripts/chrome/*.js')
+        .pipe($.plumber()) 
+        .pipe($.uglify())
+        .pipe(gulp.dest("./dist" + '/scripts/chrome'))
+        .pipe($.livereload(server));
+});
+
+gulp.task('locales', function() {
+    return gulp.src("./src" + '/_locales/*/*.json')
+        .pipe($.plumber()) 
+        .pipe(gulp.dest("./dist" + '/_locales/'))
+        .pipe($.livereload(server));
+});
+
 gulp.task('images', function() {
     return gulp.src("./src" + '/images/*')
         .pipe($.image())
@@ -87,14 +102,17 @@ gulp.task('watch', function() {
         }
         gulp.watch("./src/stylesheets/*.scss", ['compass']);
         gulp.watch('./src/scripts/*.js', ['js']);
+        gulp.watch('./src/scripts/chrome/*.js', ['chrome_js']);
+        gulp.watch('./src/manifest.json', ['manifest']);
         gulp.watch('./src/*.html', ['html']);
         gulp.watch('./src/*.jade', ['templates']);
+        gulp.watch('./src/_locales/*/*.json', ['locales']);
 
     });
 });
 
-gulp.task('pkg', function () {
-    gulp.src('./src/package.json')
+gulp.task('manifest', function () {
+    gulp.src('./src/manifest.json')
     .pipe(gulp.dest('./dist/'));
 })
 
@@ -110,9 +128,9 @@ gulp.task("buildwk", function() {
  
 
 // Default Task
-gulp.task('default', ['js', 'compass', 'images', 'html', 'express', 'watch', 'serve']);
+gulp.task('default', ['locales','js', 'chrome_js', 'compass', 'images', 'html', 'manifest', 'express', 'watch', 'serve']);
 
 
 gulp.task('build', function (callback) {
-    runSequence(['js', 'compass', 'images', 'html', 'pkg'], 'buildwk', callback);
+    runSequence(['locales','js','chrome_js', 'compass', 'images', 'html', 'manifest'], 'buildwk', callback);
 });

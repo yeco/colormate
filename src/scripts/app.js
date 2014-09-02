@@ -1,17 +1,10 @@
 'use strict';
-var global = (typeof global === 'object') ? global : window;
 
 var diff = require('color-diff');
 var colors = require('./colors');
-var isDesktop = false;
+var Annyang = require('annyang');
 
-if(typeof global.window.nwDispatcher === 'object'){
- isDesktop = true;   
-var gui = global.window.nwDispatcher.requireNwGui();
-var win = gui.Window.get();
-}
-    
-var annyang = require('annyang');
+var ann = new Annyang();
 
 var App = function() {
     var canvas, context, img;
@@ -29,11 +22,10 @@ var App = function() {
 
 
     this.voiceCommands = {
-        'hello': function () {
+        'hello': function() {
             console.log('hola')
         }
     }
-    // annyang.addCommands(this.voiceCommands);
 
 }
 
@@ -43,8 +35,10 @@ App.prototype.init = function() {
     this.context = this.canvas.getContext('2d');
     this.registerEventListeners();
     this.initCamera();
+    ann.init(this.voiceCommands);
 
-            // annyang.start({ autoRestart: false });
+    console.log(ann)
+    ann.trigger('hello')
 
 }
 
@@ -78,9 +72,9 @@ App.prototype.drawVideoInCanvas = function() {
         self.context.drawImage(video, 0, 0, 640, 480);
     }, 100)
 }
-App.prototype.hideLoader = function () {
+App.prototype.hideLoader = function() {
     var loading = document.querySelector('.loading');
-    loading.style.display= "none";
+    loading.style.display = "none";
 }
 
 App.prototype.findPos = function(obj) {
@@ -102,7 +96,7 @@ App.prototype.findPos = function(obj) {
 App.prototype.output = function(o) {
     var out = document.querySelector('.video_label p');
     var h = this.rgbToHex(o.R, o.G, o.B);
-    var colorStr = "<span style='color: " + h + "'>" + o.name +"</span>";
+    var colorStr = "<span style='color: " + h + "'>" + o.name + "</span>";
     out.innerHTML = "It's " + colorStr + "!";
 }
 
@@ -117,9 +111,9 @@ App.prototype.registerEventListeners = function(argument) {
         var position = self.findPos(this);
         var x = e.pageX - position.x;
         var y = e.pageY - position.y;
-            var context = this.getContext('2d');
+        var context = this.getContext('2d');
 
-        self.extractColor(context,x, y);
+        self.extractColor(context, x, y);
 
     });
 
@@ -127,24 +121,6 @@ App.prototype.registerEventListeners = function(argument) {
         self.drawVideoInCanvas();
         self.hideLoader();
     }, false);
-    if(isDesktop){
-
-
-    var btn_close = document.querySelector('.btn-close');
-    btn_close.addEventListener('click',  function () {
-        win.close()
-    });
-    var btn_minimize = document.querySelector('.btn-minimize');
-    btn_minimize.addEventListener('click',  function () {
-        win.minimize()
-    })
-
-    var btn_dev = document.querySelector('.btn-dev');
-    btn_dev.addEventListener('click',  function () {
-        win.showDevTools()
-    })
-
-    }
 
 }
 
@@ -329,5 +305,3 @@ App.prototype.HSVtoRGB = function(color) {
     }
     return [r, g, b];
 };
-
-

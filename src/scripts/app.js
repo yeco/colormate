@@ -33,13 +33,47 @@ var App = function() {
 App.prototype.init = function() {
     this.canvas = document.getElementById('image_canvas');
     this.context = this.canvas.getContext('2d');
+
+    this.ui_canvas = document.getElementById('ui_canvas');
+    this.ui_context = this.ui_canvas.getContext('2d');
+
     this.registerEventListeners();
+    this.loadingAnimation();
     this.initCamera();
     ann.init(this.voiceCommands);
 
     console.log(ann)
     ann.trigger('hello')
 
+}
+
+App.prototype.loadingAnimation = function() {
+    var ctx = this.context;
+    var canvas = this.canvas;
+    var self = this;
+    this.loadingInterval = null;
+
+    var loadingImg = new Image();
+
+    loadingImg.onload = function() {
+        ctx.drawImage(loadingImg, 0, 0, 128, 128);
+
+        var ang = 0; //angle
+        var fps = 1000 / 25;
+        var cache = this;
+        self.loadingInterval = setInterval(function() {
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(Math.PI / 180 * (ang += 5));
+            ctx.drawImage(loadingImg, -cache.width / 2, -cache.height / 2, cache.width, cache.height); //draw the image ;)
+            ctx.restore();
+        }, fps);
+
+
+
+    }
+    loadingImg.src = '../images/icon-256.png';
 }
 
 module.exports = App;
@@ -63,13 +97,152 @@ App.prototype.initCamera = function(callback) {
         }, errBack);
     }
     this.drawVideoInCanvas();
+    this.updateUI();
+}
+
+
+App.prototype.updateUI = function(x, y) {
+
+    var canvas = this.ui_canvas;
+    var context = this.ui_context;
+
+
+    var canvasHeight = canvas.height;
+    var canvasWidth = canvas.width;
+
+    var canvasX = (canvasWidth / 2);
+    var canvasY = (canvasHeight / 2);
+
+    var x = x || canvasX;
+    var y = y || canvasY;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    this.drawHLine(canvas, context, x, y);
+    this.drawVLine(canvas, context, x, y);
+    this.drawBullseye(canvas, context, x, y);
+    this.drawVideoUILines();
+
 
 }
 
+App.prototype.drawVideoUILines = function() {
+
+    var canvas = this.ui_canvas;
+    var context = this.ui_context;
+
+    var canvasHeight = canvas.height;
+    var canvasWidth = canvas.width;
+
+    var outerWidth = canvasWidth - 20;
+    var outerHeight = canvasHeight - 20;
+
+
+
+
+
+    //border line
+    context.beginPath();
+    context.rect(10, 10, outerWidth, outerHeight);
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgba(255,255,255,0.5)';
+    context.stroke();
+    context.closePath();
+
+    this.drawBullseye(canvas, context);
+}
+
+
+
+
+
+App.prototype.drawBullseye = function(canvas, context, x, y) {
+
+    var canvasHeight = canvas.height;
+    var canvasWidth = canvas.width;
+    var innerWidth = canvasWidth / 6;
+    var innerHeight = canvasHeight / 6;
+    var innerPosX = x || (canvasWidth / 2);
+    var innerPosY = y || (canvasHeight / 2);
+
+    var eyePosX = innerPosX - (innerWidth / 2) + 8
+    var eyePosY = innerPosY - (innerHeight / 2) + 8
+    var eyeWidth = innerWidth - 16
+    var eyeHeight = innerHeight - 16
+
+    // outer circle
+    context.beginPath();
+
+    context.arc(innerPosX, innerPosY, innerWidth / 2, 0, 2 * Math.PI, false);
+
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgba(255,255,255,0.5)';
+    context.stroke();
+    context.closePath();
+
+    // inner circle (red, red wine)
+
+    context.beginPath();
+    context.arc(innerPosX, innerPosY, innerWidth / 3, 0, 2 * Math.PI, false);
+
+    context.lineWidth = 12;
+    context.strokeStyle = 'rgba(255,255,255,0.2)';
+    context.stroke();
+    context.closePath();
+
+
+    context.beginPath();
+    context.rect(eyePosX, eyePosY, eyeWidth, eyeHeight);
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgba(255,255,255,0.5)';
+    context.stroke();
+    context.closePath();
+
+    this.eye = {
+        x: eyePosX,
+        y: eyePosY,
+        height: eyeWidth,
+        width: eyeHeight
+    }
+
+}
+
+App.prototype.drawHLine = function(canvas, context, x, y) {
+
+    var canvasWidth = canvas.width;
+
+    context.beginPath();
+    context.lineWidth = 1;
+    context.moveTo(0, y);
+    context.lineTo(canvasWidth, y);
+
+    context.strokeStyle = 'rgba(255,255,255,0.5)';
+    context.stroke();
+    context.closePath();
+
+}
+
+App.prototype.drawVLine = function(canvas, context, x, y) {
+
+    var canvasHeight = canvas.height;
+
+    context.beginPath();
+    context.lineWidth = 1;
+    context.moveTo(x, 0);
+    context.lineTo(x, canvasHeight);
+
+    context.strokeStyle = 'rgba(255,255,255,0.5)';
+    context.stroke();
+    context.closePath();
+}
 App.prototype.drawVideoInCanvas = function() {
     var self = this;
+    var ctx = this.context;
+    var canvas = this.canvas;
+    clearInterval(self.loadingInterval);
+
     setInterval(function() {
-        self.context.drawImage(video, 0, 0, 640, 480);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, 0, 0, 640, 480);
     }, 100)
 }
 App.prototype.hideLoader = function() {
@@ -108,14 +281,20 @@ App.prototype.rounded = function(num) {
 App.prototype.registerEventListeners = function(argument) {
     var self = this;
     this.canvas.addEventListener('click', function(e) {
-        var position = self.findPos(this);
-        var x = e.pageX - position.x;
-        var y = e.pageY - position.y;
         var context = this.getContext('2d');
-
-        self.extractColor(context, x, y);
+        self.extractColor(context);
 
     });
+
+    this.canvas.addEventListener('mousemove', function(evt) {
+        var canvas = evt.target;
+        var rect = canvas.getBoundingClientRect();
+
+        var x = (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+        var y = (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+
+        self.updateUI(x, y);
+    })
 
     this.video.addEventListener("loadeddata", function() {
         self.drawVideoInCanvas();
@@ -126,8 +305,8 @@ App.prototype.registerEventListeners = function(argument) {
 
 App.prototype.extractColor = function(context, x, y) {
     var self = this;
-
-    var colors = self.getColors(context, x, y, 10, 10);
+    var eye = this.eye;
+    var colors = self.getColors(context, eye.x, eye.y, eye.width, eye.height);
     var averageColor = {};
     var colorval = 0;
     for (var hex in colors) {
